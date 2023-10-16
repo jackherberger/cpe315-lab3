@@ -6,7 +6,7 @@ import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.ArrayList;
 
-public class lab2 {
+public class lab3 {
     public static class And {
 
         public String opcode;
@@ -104,7 +104,7 @@ public class lab2 {
             this.opcode = "000000";
             this.rd = rd;
             this.rt = rt;
-            this.sa = changeBinLen(sa, 5, 0);
+            this.sa = sa;
             this.rs = "00000";
             this.funct = "000000";
         }
@@ -391,7 +391,8 @@ public class lab2 {
             else if (split[0].equals("sll")){
                 String rd = reg_codes.get(split[1]);
                 String rt = reg_codes.get(split[2]);
-                String sa = Integer.toBinaryString(Integer.parseInt(split[3]));
+                String temp = Integer.toBinaryString(Integer.parseInt(split[3]));
+                String sa = changeBinLen(temp, 5, 0);
                 Sll curr = new Sll(rd, rt, sa);
                 curr.printObj();
             }
