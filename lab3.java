@@ -19,12 +19,12 @@ public class lab3 extends instructions {
         Hashtable<String, String> reg_codes = buildRegisterTable();
         ArrayList<String> lines = getLines(reader);
         Hashtable<String, String> label_addresses = buildLabelTable(lines);
-        write(reg_codes, lines, label_addresses);
+        ArrayList<Object> write = write(reg_codes, lines, label_addresses);
 
     }
 
-    public static void write(Hashtable<String, String> reg_codes, ArrayList<String> lines, Hashtable<String, String> label_addresses) {
-
+    public static ArrayList<Object> write(Hashtable<String, String> reg_codes, ArrayList<String> lines, Hashtable<String, String> label_addresses) {
+        ArrayList<Object> instructions = new ArrayList<>();
         int pc = 0;
         for (String str : lines) {
             if (str.indexOf(':') != -1) {
@@ -41,6 +41,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 And curr = new And(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
 
             }
             else if (split[0].equals("add")){
@@ -49,6 +50,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Add curr = new Add(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("or")){
                 String rd = reg_codes.get(split[1]);
@@ -56,6 +58,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Or curr = new Or(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("sub")){
                 String rd = reg_codes.get(split[1]);
@@ -63,6 +66,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Sub curr = new Sub(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("sll")){
                 String rd = reg_codes.get(split[1]);
@@ -70,6 +74,7 @@ public class lab3 extends instructions {
                 String sa = Integer.toBinaryString(Integer.parseInt(split[3]));
                 Sll curr = new Sll(rd, rt, sa);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("slt")){
                 String rd = reg_codes.get(split[1]);
@@ -77,11 +82,13 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Slt curr = new Slt(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("jr")){
                 String rs = reg_codes.get(split[1]);
                 Jr curr = new Jr(rs);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("addi")){
                 String rt = reg_codes.get(split[1]);
@@ -90,6 +97,7 @@ public class lab3 extends instructions {
                 String imm = changeBinLen(temp, 16, Integer.parseInt(split[3]));
                 Addi curr = new Addi(rt, rs, imm);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("beq")){
                 String rs = reg_codes.get(split[1]);
@@ -100,6 +108,7 @@ public class lab3 extends instructions {
                 String offset = changeBinLen(bin_offset, 16, num_offset);
                 Beq curr = new Beq(rs, rt, offset);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("bne")){
                 String rs = reg_codes.get(split[1]);
@@ -110,6 +119,7 @@ public class lab3 extends instructions {
                 String offset = changeBinLen(bin_offset, 16, num_offset);
                 Bne curr = new Bne(rs, rt, offset);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("lw")){
                 String rt = reg_codes.get(split[1]);
@@ -118,6 +128,7 @@ public class lab3 extends instructions {
                 String rs = reg_codes.get(split[3]);
                 Lw curr = new Lw(rt, offset, rs);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("sw")){
                 String rt = reg_codes.get(split[1]);
@@ -126,25 +137,28 @@ public class lab3 extends instructions {
                 String rs = reg_codes.get(split[3]);
                 Sw curr = new Sw(rt, offset, rs);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("j")){
                 String target = changeBinLen(label_addresses.get(split[1]), 26, 0);
                 J curr = new J(target);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("jal")){
                 String target = changeBinLen(label_addresses.get(split[1]), 26, 0);
                 Jal curr = new Jal(target);
                 curr.printObj();
+                instructions.add(curr);
             }
             else {
                 System.out.println("invalid instruction: " + split[0]);
                 break;
             }
-            
             System.out.println();
             pc += 1;
         }
+        return instructions;
     }
 
     public static ArrayList<String> getLines(Scanner reader) throws IOException {
