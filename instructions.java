@@ -1,4 +1,5 @@
 public class instructions {
+    
     public static class And{
 
         public String opcode;

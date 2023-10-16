@@ -9,18 +9,31 @@ import java.util.ArrayList;
 public class lab3 extends instructions {
 
     public static void main(String[] args) throws IOException {
-        if (args.length != 1) {
+        if (args.length == 0) {
             System.out.println("Usage java Main <filename>");
             System.exit(1);
         }
-        
         String filename = args[0];
+        String scriptname;
+        ArrayList<String> scriptLines;
+        if (args.length > 1) {
+            scriptname = args[1];   
+            Scanner scriptReader = new Scanner(new FileReader(scriptname)); 
+            scriptLines = getScripts(scriptReader); 
+        }
         Scanner reader = new Scanner(new FileReader(filename));
         Hashtable<String, String> reg_codes = buildRegisterTable();
         ArrayList<String> lines = getLines(reader);
         Hashtable<String, String> label_addresses = buildLabelTable(lines);
         write(reg_codes, lines, label_addresses);
+    }
 
+    public static ArrayList<String> getScripts(Scanner reader) {
+        ArrayList<String> lst = new ArrayList<>();
+        while(reader.hasNextLine()) {
+            lst.add(reader.next());
+        }
+        return lst;
     }
 
     public static void write(Hashtable<String, String> reg_codes, ArrayList<String> lines, Hashtable<String, String> label_addresses) {
