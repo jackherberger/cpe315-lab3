@@ -24,14 +24,9 @@ public class lab3 extends instructions {
         Hashtable<String, String> reg_codes = buildRegisterTable();
         ArrayList<String> lines = getLines(reader);
         Hashtable<String, String> label_addresses = buildLabelTable(lines);
-// <<<<<<< HEAD
         ArrayList<Object> write = write(reg_codes, lines, label_addresses);
     }
-// =======
-//         write(reg_codes, lines, label_addresses);
-//     }
-// >>>>>>> origin/
-// scriptsetup
+
     public static ArrayList<String> getScripts(Scanner reader) {
         ArrayList<String> lst = new ArrayList<>();
         while(reader.hasNextLine()) {
