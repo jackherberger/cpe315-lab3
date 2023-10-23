@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 public class lab3 extends instructions {
-
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             System.out.println("Usage java Main <filename>");
@@ -25,7 +25,192 @@ public class lab3 extends instructions {
         Hashtable<String, String> reg_codes = buildRegisterTable();
         ArrayList<String> lines = getLines(reader);
         Hashtable<String, String> label_addresses = buildLabelTable(lines);
-        write(reg_codes, lines, label_addresses);
+        ArrayList<Object> write = write(reg_codes, lines, label_addresses);
+        
+        spim(write, reg_codes, label_addresses);
+    }
+
+    public static void spim(ArrayList<Object> write, Hashtable<String, String> reg_codes, Hashtable<String, String> label_addresses) {
+        int[] registers = new int[28];
+        int[] data_memory = new int[8192];
+        final int[] pc = {0};
+        for (int i = 0; i < data_memory.length; i++) {
+            data_memory[i] = 0;
+        }
+        Scanner scanner = new Scanner(System.in);
+        Runnable runnable = new Runnable() {
+            public void run() {
+                Object curr = write.get(pc[0]);
+                if (curr.getClass().equals(instructions.And.class)){
+                    And obj = (And) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] & registers[rt];
+                }
+                else if (curr.getClass().equals(instructions.Or.class)){
+                    Or obj = (Or) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = (registers[rs] | registers[rt]);
+                }
+                else if (curr.getClass().equals(instructions.Add.class)){
+                    Add obj = (Add) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] + registers[rt];
+                }
+                else if (curr.getClass().equals(instructions.Sll.class)){
+                    Sll obj = (Sll) curr;
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer sa = Integer.parseInt(obj.sa, 2);
+                    registers[rd] = registers[rt] << sa;
+                }
+                else if (curr.getClass().equals(instructions.Sub.class)){
+                    Sub obj = (Sub) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] - registers[rt];
+                }
+                else if (curr.getClass().equals(instructions.Slt.class)){
+                    Slt obj = (Slt) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int set = 0;
+                    if (rs < rt) { 
+                        set = 1;
+                    }
+                    registers[rd] = set;
+                }
+                else if (curr.getClass().equals(instructions.Jr.class)){
+                    Jr obj = (Jr) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    pc[0] = rs;
+                }
+                else if (curr.getClass().equals(instructions.Addi.class)){
+                    Addi obj = (Addi) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer imm = Integer.parseInt(obj.imm, 2);
+                    registers[rt] = registers[rs] + imm;
+                }
+                else if (curr.getClass().equals(instructions.Beq.class)){
+                    Beq obj = (Beq) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    byte b_offset = (byte)((int)offset);
+                    if (rs == rt){
+                        pc[0] += b_offset;
+                    }
+                }
+                else if (curr.getClass().equals(instructions.Bne.class)){
+                    Bne obj = (Bne) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    byte b_offset = (byte)((int)offset);
+                    if (rs != rt){
+                        pc[0] += b_offset;
+                    }
+                }
+                else if (curr.getClass().equals(instructions.Lw.class)){
+                    Lw obj = (Lw) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    registers[rt] = data_memory[rs+offset];
+                }
+                else if (curr.getClass().equals(instructions.Sw.class)){
+                    Sw obj = (Sw) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    registers[rs+offset] = data_memory[rt];
+                }
+                else if (curr.getClass().equals(instructions.J.class)){
+                    Jal obj = (Jal)curr;
+                    pc[0] = Integer.parseInt(obj.target, 2);
+                }
+                else if (curr.getClass().equals(instructions.Jal.class)){
+                    Jal obj = (Jal)curr;
+                    registers[28] = pc[0];
+                    pc[0] = Integer.parseInt(obj.target, 2);
+                }
+                pc[0]++;
+            }
+        };
+
+        while (true) {
+            System.out.print("mips> ");
+            String input = scanner.nextLine();
+            if (input.length() == 0) {
+                System.out.print("Please enter a command");
+            }
+            if (input.charAt(0) == 'q') {
+                break;
+            }
+            else if (input.charAt(0) == 'm') {
+                int space1 = input.indexOf(' ');
+                int space2 = input.indexOf(' ', space1+1);
+                int loc1 = Integer.parseInt(input.substring(space1+1, space2));
+                int loc2 = Integer.parseInt(input.substring(space2+1, input.length()));
+                for (int i = loc1; i <= loc2; i++) {
+                    System.out.println("[" + i + "]" + " = " + data_memory[i]);
+                }
+            }
+            else if (input.charAt(0) == 's') {
+                if (input.length() > 1) {
+                    for (int i = 0; i < input.charAt(1); i ++) {
+                        if (pc[0] < write.size()){
+                            runnable.run();
+                        }
+                        else {
+                            System.out.println("Program has ended.");
+                            break;
+                        }
+                    }
+                }
+                else {
+                    if (pc[0] < write.size()){
+                        runnable.run();
+                    }
+                    else {
+                        System.out.println("Program has ended.");
+                        break;
+                    }
+                }
+            }
+            else if (input.charAt(0) == 'c'){
+                for (int i = 0; i < 32; i++) {
+                    registers[i] = 0;
+                }
+                for (int i = 0; i < 8192; i++) {
+                    data_memory[i] = 0;
+                }
+                pc[0] = 0;
+            }
+            else if (input.charAt(0) == 'h') {
+                System.out.print("\nh = show help\nd = dump register state\ns = single step through the program (i.e. execute 1 instruction and stop)\ns num = step through num instructions of the program\nr = run until the program ends\nm num1 num2 = display data memory from location num1 to num2\nc = clear all registers, memory, and the program counter to 0\nq = exit the program\n\n");
+            }
+            else if (input.charAt(0) == 'd') {
+                ArrayList<String> keysList = new ArrayList<>();
+                Enumeration<String> keys = reg_codes.keys();
+                while (keys.hasMoreElements()) {
+                    keysList.add(keys.nextElement());
+                }
+                System.out.println("pc = " + pc[0]);
+                for (int i = 0; i < registers.length; i ++){
+                    System.out.println("$" + keysList.get(i) + " = " + registers[i]);
+                }
+            }
+        }
+        scanner.close();
     }
 
     public static ArrayList<String> getScripts(Scanner reader) {
@@ -36,8 +221,8 @@ public class lab3 extends instructions {
         return lst;
     }
 
-    public static void write(Hashtable<String, String> reg_codes, ArrayList<String> lines, Hashtable<String, String> label_addresses) {
-
+    public static ArrayList<Object> write(Hashtable<String, String> reg_codes, ArrayList<String> lines, Hashtable<String, String> label_addresses) {
+        ArrayList<Object> instructions = new ArrayList<>();
         int pc = 0;
         for (String str : lines) {
             if (str.indexOf(':') != -1) {
@@ -54,6 +239,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 And curr = new And(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
 
             }
             else if (split[0].equals("add")){
@@ -62,6 +248,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Add curr = new Add(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("or")){
                 String rd = reg_codes.get(split[1]);
@@ -69,6 +256,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Or curr = new Or(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("sub")){
                 String rd = reg_codes.get(split[1]);
@@ -76,6 +264,7 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Sub curr = new Sub(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("sll")){
                 String rd = reg_codes.get(split[1]);
@@ -83,6 +272,7 @@ public class lab3 extends instructions {
                 String sa = Integer.toBinaryString(Integer.parseInt(split[3]));
                 Sll curr = new Sll(rd, rt, sa);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("slt")){
                 String rd = reg_codes.get(split[1]);
@@ -90,11 +280,13 @@ public class lab3 extends instructions {
                 String rt = reg_codes.get(split[3]);
                 Slt curr = new Slt(rd, rs, rt);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("jr")){
                 String rs = reg_codes.get(split[1]);
                 Jr curr = new Jr(rs);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("addi")){
                 String rt = reg_codes.get(split[1]);
@@ -103,6 +295,7 @@ public class lab3 extends instructions {
                 String imm = changeBinLen(temp, 16, Integer.parseInt(split[3]));
                 Addi curr = new Addi(rt, rs, imm);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("beq")){
                 String rs = reg_codes.get(split[1]);
@@ -113,6 +306,7 @@ public class lab3 extends instructions {
                 String offset = changeBinLen(bin_offset, 16, num_offset);
                 Beq curr = new Beq(rs, rt, offset);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("bne")){
                 String rs = reg_codes.get(split[1]);
@@ -123,6 +317,7 @@ public class lab3 extends instructions {
                 String offset = changeBinLen(bin_offset, 16, num_offset);
                 Bne curr = new Bne(rs, rt, offset);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("lw")){
                 String rt = reg_codes.get(split[1]);
@@ -131,6 +326,7 @@ public class lab3 extends instructions {
                 String rs = reg_codes.get(split[3]);
                 Lw curr = new Lw(rt, offset, rs);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("sw")){
                 String rt = reg_codes.get(split[1]);
@@ -139,25 +335,28 @@ public class lab3 extends instructions {
                 String rs = reg_codes.get(split[3]);
                 Sw curr = new Sw(rt, offset, rs);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("j")){
                 String target = changeBinLen(label_addresses.get(split[1]), 26, 0);
                 J curr = new J(target);
                 curr.printObj();
+                instructions.add(curr);
             }
             else if (split[0].equals("jal")){
                 String target = changeBinLen(label_addresses.get(split[1]), 26, 0);
                 Jal curr = new Jal(target);
                 curr.printObj();
+                instructions.add(curr);
             }
             else {
                 System.out.println("invalid instruction: " + split[0]);
                 break;
             }
-            
             System.out.println();
             pc += 1;
         }
+        return instructions;
     }
 
     public static ArrayList<String> getLines(Scanner reader) throws IOException {
@@ -260,4 +459,3 @@ public class lab3 extends instructions {
 // J Type - j, jal
 
 }
- 

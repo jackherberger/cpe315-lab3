@@ -1,0 +1,8 @@
+addi $t1, $zero, 30
+loop:
+addi $t0, $t0, 10
+bne $t0, $t1, loop
+addi $t2, $0, 50
+addi $t2, $0, 50
+addi $t2, $0, 50
+addi $t2, $0, 50
