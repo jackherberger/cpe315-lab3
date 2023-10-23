@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 public class lab3 extends instructions {
     public static void main(String[] args) throws IOException {
@@ -25,6 +26,185 @@ public class lab3 extends instructions {
         ArrayList<String> lines = getLines(reader);
         Hashtable<String, String> label_addresses = buildLabelTable(lines);
         ArrayList<Object> write = write(reg_codes, lines, label_addresses);
+        
+        spim(write, reg_codes, label_addresses);
+    }
+
+    
+    public static void spim(ArrayList<Object> write, Hashtable<String, String> reg_codes, Hashtable<String, String> label_addresses) {
+        int[] registers = new int[28];
+        int[] data_memory = new int[8192];
+        for (int i = 0; i < data_memory.length; i++) {
+            data_memory[i] = 0;
+        }
+        Scanner scanner = new Scanner(System.in);
+
+        final int[] pc = {0};
+
+
+        Runnable runnable = new Runnable() {
+            public void run() {
+                Object curr = write.get(pc[0]);
+                
+
+                if (curr.getClass().equals(instructions.And.class)){
+                    And obj = (And) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] & registers[rt];
+                    System.out.println(registers[rd]);
+                }
+                else if (curr.getClass().equals(instructions.Or.class)){
+                    Or obj = (Or) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = (registers[rs] | registers[rt]);
+                    System.out.println(registers[rd]);
+                }
+                else if (curr.getClass().equals(instructions.Add.class)){
+                    Add obj = (Add) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] + registers[rt];
+                    System.out.println(registers[rd]);
+                }
+                else if (curr.getClass().equals(instructions.Sll.class)){
+                    Sll obj = (Sll) curr;
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer sa = Integer.parseInt(obj.sa, 2);
+                    registers[rd] = registers[rt] << sa;
+                    System.out.println(registers[rd]);
+                }
+                else if (curr.getClass().equals(instructions.Sub.class)){
+                    Sub obj = (Sub) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] - registers[rt];
+                    System.out.println(registers[rd]);
+                }
+                else if (curr.getClass().equals(instructions.Slt.class)){
+                    Slt obj = (Slt) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int set = 0;
+                    if (rs < rt) { 
+                        set = 1;
+                    }
+                    registers[rd] = set;
+                    System.out.println(registers[rd]);
+                }
+                else if (curr.getClass().equals(instructions.Jr.class)){
+                    Jr obj = (Jr) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    pc[0] = rs;
+                }
+                else if (curr.getClass().equals(instructions.Addi.class)){
+                    System.out.println("True");
+                }
+                else if (curr.getClass().equals(instructions.Beq.class)){
+                    System.out.println("True");
+                }
+                else if (curr.getClass().equals(instructions.Bne.class)){
+                    System.out.println("True");
+                }
+                else if (curr.getClass().equals(instructions.Lw.class)){
+                    System.out.println("True");
+                }
+                else if (curr.getClass().equals(instructions.Sw.class)){
+                    System.out.println("True");
+                }
+                else if (curr.getClass().equals(instructions.J.class)){
+                    System.out.println("True");
+                }
+                else if (curr.getClass().equals(instructions.Jal.class)){
+                    System.out.println("True");
+                }
+                pc[0]++;
+            
+
+            }
+        };
+
+
+        while (true) {
+            System.out.print("mips> ");
+
+            String input = scanner.nextLine();
+            if (input.length() == 0) {
+                System.out.print("Please enter a command");
+            }
+            if (input.charAt(0) == 'q') {
+                break;
+            }
+
+            else if (input.charAt(0) == 'm') {
+                int space1 = input.indexOf(' ');
+                int space2 = input.indexOf(' ', space1+1);
+                int loc1 = Integer.parseInt(input.substring(space1+1, space2));
+                int loc2 = Integer.parseInt(input.substring(space2+1, input.length()));
+                for (int i = loc1; i <= loc2; i++) {
+                    System.out.println("[" + i + "]" + " = " + data_memory[i]);
+                }
+            }
+
+            else if (input.charAt(0) == 's') {
+                if (input.length() > 1) {
+                    for (int i = 0; i < input.charAt(1); i ++) {
+                        if (pc[0] < write.size()){
+                            runnable.run();
+                        }
+                        else {
+                            System.out.println("Program has ended.");
+                            break;
+                        }
+                    }
+                }
+                else {
+                    if (pc[0] < write.size()){
+                        runnable.run();
+                    }
+                    else {
+                        System.out.println("Program has ended.");
+                        break;
+                    }
+                }
+            }
+            
+            else if (input.charAt(0) == 'c'){
+                for (int i = 0; i < 32; i++) {
+                    registers[i] = 0;
+                }
+                for (int i = 0; i < 8192; i++) {
+                    data_memory[i] = 0;
+                }
+                pc[0] = 0;
+            }
+            
+            else if (input.charAt(0) == 'h') {
+                System.out.print("\nh = show help\nd = dump register state\ns = single step through the program (i.e. execute 1 instruction and stop)\ns num = step through num instructions of the program\nr = run until the program ends\nm num1 num2 = display data memory from location num1 to num2\nc = clear all registers, memory, and the program counter to 0\nq = exit the program\n\n");
+            }
+            
+            else if (input.charAt(0) == 'd') {
+
+                ArrayList<String> keysList = new ArrayList<>();
+                Enumeration<String> keys = reg_codes.keys();
+                while (keys.hasMoreElements()) {
+                    keysList.add(keys.nextElement());
+                }
+
+                System.out.println("pc = " + pc);
+                for (int i = 0; i < registers.length; i ++){
+                    System.out.println("$" + keysList.get(i) + " = " + registers[i]);
+                }
+                
+            }
+        }
     }
 
     public static ArrayList<String> getScripts(Scanner reader) {
