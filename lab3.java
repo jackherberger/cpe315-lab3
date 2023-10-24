@@ -175,6 +175,7 @@ public class lab3 extends instructions {
 
             else if (input.charAt(0) == 's') {
                 if (input.length() > 1) {
+                    System.out.println(input.charAt(1) + "instruction(s) executed");
                     for (int i = 0; i < input.charAt(1); i ++) {
                         if (pc[0] < write.size()){
                             runnable.run();
@@ -186,6 +187,7 @@ public class lab3 extends instructions {
                     }
                 }
                 else {
+                    System.out.println("1 instruction(s) executed");
                     if (pc[0] < write.size()){
                         runnable.run();
                     }
@@ -195,9 +197,16 @@ public class lab3 extends instructions {
                     }
                 }
             }
+
+            else if (input.charAt(0) == 'r') {
+                while (pc[0] < write.size()) {
+                    runnable.run();
+                }
+            }
             
             else if (input.charAt(0) == 'c'){
-                for (int i = 0; i < 32; i++) {
+                System.out.println("Simulator reset");
+                for (int i = 0; i < 28; i++) {
                     registers[i] = 0;
                 }
                 for (int i = 0; i < 8192; i++) {
