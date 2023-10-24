@@ -89,7 +89,7 @@ public class lab3 extends instructions {
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer rd = Integer.parseInt(obj.rd, 2);
                     int set = 0;
-                    if (rs < rt) { 
+                    if (registers[rs] < registers[rt]) { 
                         set = 1;
                     }
                     registers[rd] = set;
@@ -97,7 +97,7 @@ public class lab3 extends instructions {
                 else if (curr.getClass().equals(instructions.Jr.class)){
                     Jr obj = (Jr) curr;
                     Integer rs = Integer.parseInt(obj.rs, 2);
-                    pc[0] = rs;
+                    pc[0] = registers[rs];
                 }
                 else if (curr.getClass().equals(instructions.Addi.class)){
                     Addi obj = (Addi) curr;
