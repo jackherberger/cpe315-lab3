@@ -104,33 +104,28 @@ public class lab3 extends instructions {
                     Integer rs = Integer.parseInt(obj.rs, 2);
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer imm = Integer.parseInt(obj.imm, 2);
-                    if (obj.imm.charAt(0) == '1'){
-                        byte b_offset = (byte)((int)imm);
-                        registers[rt] = registers[rs] + b_offset;
-                    }
-                    else {
-                        registers[rt] = registers[rs] + imm;
-
-                    }
+                    byte b_offset = (byte)((int)imm);
+                    registers[rt] = registers[rs] + b_offset;
+                
                 
                 }
                 else if (curr.getClass().equals(instructions.Beq.class)){
                     Beq obj = (Beq) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
-                    if (rs == rt){
+                    if (registers[rs] == registers[rt]){
                         pc[0] += b_offset;
                     }
                 }
                 else if (curr.getClass().equals(instructions.Bne.class)){
                     Bne obj = (Bne) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
-                    if (rs != rt){
+                    if (registers[rs] != registers[rt]){
                         pc[0] += b_offset;
                     }
                 }
@@ -187,8 +182,10 @@ public class lab3 extends instructions {
 
             else if (input.charAt(0) == 's') {
                 if (input.length() > 1) {
-                    System.out.println(input.charAt(1) + "instruction(s) executed");
-                    for (int i = 0; i < input.charAt(1); i ++) {
+                    int space = input.indexOf(' ');
+                    int loc = Integer.parseInt(input.substring(space+1, input.length()));
+                    System.out.println("    " + loc + " instruction(s) executed");
+                    for (int i = 0; i < loc; i ++) {
                         if (pc[0] < write.size()){
                             runnable.run();
                         }
@@ -330,7 +327,7 @@ public class lab3 extends instructions {
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
-                    if (rs == rt){
+                    if (registers[rs] == registers[rt]){
                         pc[0] += b_offset;
                     }
                 }
@@ -340,7 +337,7 @@ public class lab3 extends instructions {
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
-                    if (rs != rt){
+                    if (registers[rs] != registers[rt]){
                         pc[0] += b_offset;
                     }
                 }
@@ -406,8 +403,10 @@ public class lab3 extends instructions {
 
             else if (input.charAt(0) == 's') {
                 if (input.length() > 1) {
-                    System.out.println(input.charAt(1) + "instruction(s) executed");
-                    for (int i = 0; i < input.charAt(1); i ++) {
+                    int space = input.indexOf(' ');
+                    int loc = Integer.parseInt(input.substring(space+1, input.length()));
+                    System.out.println("    " + loc + " instruction(s) executed");
+                    for (int i = 0; i < loc; i ++) {
                         if (pc[0] < write.size()){
                             runnable.run();
                         }
@@ -420,7 +419,6 @@ public class lab3 extends instructions {
                     }
                 }
             }
-
             else if (input.charAt(0) == 'r') {
                 while (pc[0] < write.size()) {
                     runnable.run();
