@@ -50,44 +50,44 @@ public class lab3 extends instructions {
                 Object curr = write.get(pc[0]);
                 if (curr.getClass().equals(instructions.And.class)){
                     And obj = (And) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] & registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.Or.class)){
                     Or obj = (Or) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = (registers[rs] | registers[rt]);
                 }
                 else if (curr.getClass().equals(instructions.Add.class)){
                     Add obj = (Add) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] + registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.Sll.class)){
                     Sll obj = (Sll) curr;
-                    Integer rd = Integer.parseInt(obj.rd, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer sa = Integer.parseInt(obj.sa, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int sa = Integer.parseInt(obj.sa, 2);
                     registers[rd] = registers[rt] << sa;
                 }
                 else if (curr.getClass().equals(instructions.Sub.class)){
                     Sub obj = (Sub) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] - registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.Slt.class)){
                     Slt obj = (Slt) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     int set = 0;
                     if (registers[rs] < registers[rt]) { 
                         set = 1;
@@ -96,14 +96,14 @@ public class lab3 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.Jr.class)){
                     Jr obj = (Jr) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
                     pc[0] = registers[rs];
                 }
                 else if (curr.getClass().equals(instructions.Addi.class)){
                     Addi obj = (Addi) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer imm = Integer.parseInt(obj.imm, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int imm = Integer.parseInt(obj.imm, 2);
                     byte b_offset = (byte)((int)imm);
                     registers[rt] = registers[rs] + b_offset;
                 
@@ -131,25 +131,25 @@ public class lab3 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.Lw.class)){
                     Lw obj = (Lw) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     registers[rt] = data_memory[registers[rs]+offset];
                 }
                 else if (curr.getClass().equals(instructions.Sw.class)){
                     Sw obj = (Sw) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     data_memory[registers[rs]+offset] = registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.J.class)){
-                    Jal obj = (Jal)curr;
+                    J obj = (J)curr;
                     pc[0] = Integer.parseInt(obj.target, 2);
                 }
                 else if (curr.getClass().equals(instructions.Jal.class)){
                     Jal obj = (Jal)curr;
-                    registers[28] = pc[0];
+                    registers[31] = pc[0];
                     pc[0] = Integer.parseInt(obj.target, 2);
                 }
                 pc[0]++;
@@ -257,46 +257,46 @@ public class lab3 extends instructions {
                 Object curr = write.get(pc[0]);
                 if (curr.getClass().equals(instructions.And.class)){
                     And obj = (And) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] & registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.Or.class)){
                     Or obj = (Or) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = (registers[rs] | registers[rt]);
                 }
                 else if (curr.getClass().equals(instructions.Add.class)){
                     Add obj = (Add) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] + registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.Sll.class)){
                     Sll obj = (Sll) curr;
-                    Integer rd = Integer.parseInt(obj.rd, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer sa = Integer.parseInt(obj.sa, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int sa = Integer.parseInt(obj.sa, 2);
                     registers[rd] = registers[rt] << sa;
                 }
                 else if (curr.getClass().equals(instructions.Sub.class)){
                     Sub obj = (Sub) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] - registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.Slt.class)){
                     Slt obj = (Slt) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int rd = Integer.parseInt(obj.rd, 2);
                     int set = 0;
-                    if (rs < rt) { 
+                    if (registers[rs] < registers[rt]) { 
                         set = 1;
                     }
                     registers[rd] = set;
@@ -304,13 +304,13 @@ public class lab3 extends instructions {
                 else if (curr.getClass().equals(instructions.Jr.class)){
                     Jr obj = (Jr) curr;
                     Integer rs = Integer.parseInt(obj.rs, 2);
-                    pc[0] = rs;
+                    pc[0] = registers[rs];
                 }
                 else if (curr.getClass().equals(instructions.Addi.class)){
                     Addi obj = (Addi) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer imm = Integer.parseInt(obj.imm, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int imm = Integer.parseInt(obj.imm, 2);
                     if (obj.imm.charAt(0) == '1'){
                         byte b_offset = (byte)((int)imm);
                         registers[rt] = registers[rs] + b_offset;
@@ -323,9 +323,9 @@ public class lab3 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.Beq.class)){
                     Beq obj = (Beq) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
                     if (registers[rs] == registers[rt]){
                         pc[0] += b_offset;
@@ -333,9 +333,9 @@ public class lab3 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.Bne.class)){
                     Bne obj = (Bne) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     byte b_offset = (byte)((int)offset);
                     if (registers[rs] != registers[rt]){
                         pc[0] += b_offset;
@@ -343,25 +343,26 @@ public class lab3 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.Lw.class)){
                     Lw obj = (Lw) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     registers[rt] = data_memory[registers[rs]+offset];
                 }
                 else if (curr.getClass().equals(instructions.Sw.class)){
                     Sw obj = (Sw) curr;
-                    Integer rs = Integer.parseInt(obj.rs, 2);
-                    Integer rt = Integer.parseInt(obj.rt, 2);
-                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    int rs = Integer.parseInt(obj.rs, 2);
+                    int rt = Integer.parseInt(obj.rt, 2);
+                    int offset = Integer.parseInt(obj.offset, 2);
                     data_memory[registers[rs]+offset] = registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.J.class)){
-                    Jal obj = (Jal)curr;
+                    J obj = (J)curr;
                     pc[0] = Integer.parseInt(obj.target, 2);
                 }
                 else if (curr.getClass().equals(instructions.Jal.class)){
                     Jal obj = (Jal)curr;
-                    registers[28] = pc[0];
+                    registers[31] = pc[0];
+                    System.out.println("Jump to spot: " + Integer.parseInt(obj.target, 2));
                     pc[0] = Integer.parseInt(obj.target, 2);
                 }
                 pc[0]++;
