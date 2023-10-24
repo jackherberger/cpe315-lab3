@@ -221,6 +221,10 @@ public class lab3 extends instructions {
             }
             
             else if (input.charAt(0) == 'd') {
+                int ra = 0;
+                if (registers[31] != 0){
+                    ra = registers[31] + 1;
+                }
                 System.out.println("\npc = " + pc[0]);
                 System.out.format("" + 
                 "$0 = %d          $v0 = %d         $v1 = %d         $a0 = %d \n" +
@@ -236,9 +240,7 @@ public class lab3 extends instructions {
                 registers[13], registers[14], registers[15], registers[16], 
                 registers[17], registers[18], registers[19], registers[20], 
                 registers[21], registers[22], registers[23], registers[24], 
-                registers[25], registers[29], registers[31]);
-
-                
+                registers[25], registers[29], ra);
             }
         }
     }
@@ -362,7 +364,6 @@ public class lab3 extends instructions {
                 else if (curr.getClass().equals(instructions.Jal.class)){
                     Jal obj = (Jal)curr;
                     registers[31] = pc[0];
-                    System.out.println("Jump to spot: " + Integer.parseInt(obj.target, 2));
                     pc[0] = Integer.parseInt(obj.target, 2) - 1;
                 }
                 pc[0]++;
@@ -441,7 +442,12 @@ public class lab3 extends instructions {
                 System.out.print("\nh = show help\nd = dump register state\ns = single step through the program (i.e. execute 1 instruction and stop)\ns num = step through num instructions of the program\nr = run until the program ends\nm num1 num2 = display data memory from location num1 to num2\nc = clear all registers, memory, and the program counter to 0\nq = exit the program\n\n");
             }
             
+    
             else if (input.charAt(0) == 'd') {
+                int ra = 0;
+                if (registers[31] != 0){
+                    ra = registers[31] + 1;
+                }
                 System.out.println("\npc = " + pc[0]);
                 System.out.format("" + 
                 "$0 = %d          $v0 = %d         $v1 = %d         $a0 = %d \n" +
@@ -457,7 +463,7 @@ public class lab3 extends instructions {
                 registers[13], registers[14], registers[15], registers[16], 
                 registers[17], registers[18], registers[19], registers[20], 
                 registers[21], registers[22], registers[23], registers[24], 
-                registers[25], registers[29], registers[31]);
+                registers[25], registers[29], ra);
 
                 
             }
