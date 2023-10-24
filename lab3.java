@@ -15,7 +15,7 @@ public class lab3 extends instructions {
         }
         String filename = args[0];
         String scriptname;
-        ArrayList<String> scriptLines;
+        ArrayList<String> scriptLines = new ArrayList<>();
         if (args.length > 1) {
             scriptname = args[1];   
             Scanner scriptReader = new Scanner(new FileReader(scriptname)); 
@@ -27,12 +27,16 @@ public class lab3 extends instructions {
         Hashtable<String, String> label_addresses = buildLabelTable(lines);
         ArrayList<Object> write = write(reg_codes, lines, label_addresses);
         
-        spim(write, reg_codes, label_addresses);
+        if (scriptLines.size() == 0) {
+            spim(write, reg_codes, label_addresses);
+        } else {
+            spimScript(write, reg_codes, label_addresses, scriptLines);
+        }
     }
 
     
     public static void spim(ArrayList<Object> write, Hashtable<String, String> reg_codes, Hashtable<String, String> label_addresses) {
-        int[] registers = new int[28];
+        int[] registers = new int[32];
         int[] data_memory = new int[8192];
         for (int i = 0; i < data_memory.length; i++) {
             data_memory[i] = 0;
@@ -100,9 +104,15 @@ public class lab3 extends instructions {
                     Integer rs = Integer.parseInt(obj.rs, 2);
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer imm = Integer.parseInt(obj.imm, 2);
-                    byte b_offset = (byte)((int)imm);
+                    if (obj.imm.charAt(0) == '1'){
+                        byte b_offset = (byte)((int)imm);
+                        registers[rt] = registers[rs] + b_offset;
+                    }
+                    else {
+                        registers[rt] = registers[rs] + imm;
+
+                    }
                 
-                    registers[rt] = registers[rs] + b_offset;
                 }
                 else if (curr.getClass().equals(instructions.Beq.class)){
                     Beq obj = (Beq) curr;
@@ -129,14 +139,14 @@ public class lab3 extends instructions {
                     Integer rs = Integer.parseInt(obj.rs, 2);
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer offset = Integer.parseInt(obj.offset, 2);
-                    registers[rt] = data_memory[rs+offset];
+                    registers[rt] = data_memory[registers[rs]+offset];
                 }
                 else if (curr.getClass().equals(instructions.Sw.class)){
                     Sw obj = (Sw) curr;
                     Integer rs = Integer.parseInt(obj.rs, 2);
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer offset = Integer.parseInt(obj.offset, 2);
-                    data_memory[rs+offset] = registers[rt];
+                    data_memory[registers[rs]+offset] = registers[rt];
                 }
                 else if (curr.getClass().equals(instructions.J.class)){
                     Jal obj = (Jal)curr;
@@ -164,6 +174,7 @@ public class lab3 extends instructions {
             }
 
             else if (input.charAt(0) == 'm') {
+                System.out.println(" ");
                 int space1 = input.indexOf(' ');
                 int space2 = input.indexOf(' ', space1+1);
                 int loc1 = Integer.parseInt(input.substring(space1+1, space2));
@@ -171,6 +182,7 @@ public class lab3 extends instructions {
                 for (int i = loc1; i <= loc2; i++) {
                     System.out.println("[" + i + "]" + " = " + data_memory[i]);
                 }
+                System.out.println(" ");
             }
 
             else if (input.charAt(0) == 's') {
@@ -180,20 +192,12 @@ public class lab3 extends instructions {
                         if (pc[0] < write.size()){
                             runnable.run();
                         }
-                        else {
-                            System.out.println("Program has ended.");
-                            break;
-                        }
                     }
                 }
                 else {
                     System.out.println("1 instruction(s) executed");
                     if (pc[0] < write.size()){
                         runnable.run();
-                    }
-                    else {
-                        System.out.println("Program has ended.");
-                        break;
                     }
                 }
             }
@@ -205,8 +209,8 @@ public class lab3 extends instructions {
             }
             
             else if (input.charAt(0) == 'c'){
-                System.out.println("Simulator reset");
-                for (int i = 0; i < 28; i++) {
+                System.out.println("Simulator reset\n");
+                for (int i = 0; i < 32; i++) {
                     registers[i] = 0;
                 }
                 for (int i = 0; i < 8192; i++) {
@@ -221,19 +225,240 @@ public class lab3 extends instructions {
             
             else if (input.charAt(0) == 'd') {
                 System.out.println("\npc = " + pc[0]);
-                System.out.format("$0 = %d          $v0 = %d         $v1 = %d         $a0 = %d \n" +
+                System.out.format("" + 
+                "$0 = %d          $v0 = %d         $v1 = %d         $a0 = %d \n" +
                 "$a1 = %d         $a2 = %d         $a3 = %d         $t0 = %d\n" +
                 "$t1 = %d         $t2 = %d         $t3 = %d         $t4 = %d\n" +
                 "$t5 = %d         $t6 = %d         $t7 = %d         $s0 = %d\n" +
                 "$s1 = %d         $s2 = %d         $s3 = %d         $s4 = %d\n" +
                 "$s5 = %d         $s6 = %d         $s7 = %d         $t8 = %d\n" +
                 "$t9 = %d         $sp = %d         $ra = %d\n\n", 
-                    registers[1], registers[2],registers[3], registers[4], 
-                    registers[5], registers[6], registers[7], registers[8], registers[9], 
-                    registers[10], registers[11], registers[12], registers[13], registers[14], 
-                    registers[15], registers[16], registers[17], registers[18], registers[19], 
-                    registers[20], registers[21], registers[22], registers[23], registers[24], 
-                    registers[25], registers[26], registers[27]);
+                registers[0], registers[2],registers[3], registers[4], 
+                registers[5], registers[6], registers[7], registers[8], 
+                registers[9], registers[10], registers[11], registers[12], 
+                registers[13], registers[14], registers[15], registers[16], 
+                registers[17], registers[18], registers[19], registers[20], 
+                registers[21], registers[22], registers[23], registers[24], 
+                registers[25], registers[29], registers[31]);
+
+                
+            }
+        }
+    }
+
+    public static void spimScript(ArrayList<Object> write, Hashtable<String, String> reg_codes, Hashtable<String, String> label_addresses,ArrayList<String> scriptLines) {
+        int[] registers = new int[32];
+        int[] data_memory = new int[8192];
+        for (int i = 0; i < data_memory.length; i++) {
+            data_memory[i] = 0;
+        }
+
+        final int[] pc = {0};
+
+        Runnable runnable = new Runnable() {
+            public void run() {
+                Object curr = write.get(pc[0]);
+                if (curr.getClass().equals(instructions.And.class)){
+                    And obj = (And) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] & registers[rt];
+                }
+                else if (curr.getClass().equals(instructions.Or.class)){
+                    Or obj = (Or) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = (registers[rs] | registers[rt]);
+                }
+                else if (curr.getClass().equals(instructions.Add.class)){
+                    Add obj = (Add) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] + registers[rt];
+                }
+                else if (curr.getClass().equals(instructions.Sll.class)){
+                    Sll obj = (Sll) curr;
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer sa = Integer.parseInt(obj.sa, 2);
+                    registers[rd] = registers[rt] << sa;
+                }
+                else if (curr.getClass().equals(instructions.Sub.class)){
+                    Sub obj = (Sub) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    registers[rd] = registers[rs] - registers[rt];
+                }
+                else if (curr.getClass().equals(instructions.Slt.class)){
+                    Slt obj = (Slt) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer rd = Integer.parseInt(obj.rd, 2);
+                    int set = 0;
+                    if (rs < rt) { 
+                        set = 1;
+                    }
+                    registers[rd] = set;
+                }
+                else if (curr.getClass().equals(instructions.Jr.class)){
+                    Jr obj = (Jr) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    pc[0] = rs;
+                }
+                else if (curr.getClass().equals(instructions.Addi.class)){
+                    Addi obj = (Addi) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer imm = Integer.parseInt(obj.imm, 2);
+                    if (obj.imm.charAt(0) == '1'){
+                        byte b_offset = (byte)((int)imm);
+                        registers[rt] = registers[rs] + b_offset;
+                    }
+                    else {
+                        registers[rt] = registers[rs] + imm;
+
+                    }
+                
+                }
+                else if (curr.getClass().equals(instructions.Beq.class)){
+                    Beq obj = (Beq) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    byte b_offset = (byte)((int)offset);
+                    if (rs == rt){
+                        pc[0] += b_offset;
+                    }
+                }
+                else if (curr.getClass().equals(instructions.Bne.class)){
+                    Bne obj = (Bne) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    byte b_offset = (byte)((int)offset);
+                    if (rs != rt){
+                        pc[0] += b_offset;
+                    }
+                }
+                else if (curr.getClass().equals(instructions.Lw.class)){
+                    Lw obj = (Lw) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    registers[rt] = data_memory[registers[rs]+offset];
+                }
+                else if (curr.getClass().equals(instructions.Sw.class)){
+                    Sw obj = (Sw) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    data_memory[registers[rs]+offset] = registers[rt];
+                }
+                else if (curr.getClass().equals(instructions.J.class)){
+                    Jal obj = (Jal)curr;
+                    pc[0] = Integer.parseInt(obj.target, 2);
+                }
+                else if (curr.getClass().equals(instructions.Jal.class)){
+                    Jal obj = (Jal)curr;
+                    registers[28] = pc[0];
+                    pc[0] = Integer.parseInt(obj.target, 2);
+                }
+                pc[0]++;
+            }
+        };
+
+        int index = -1;
+
+        while (true) {
+            System.out.print("mips> ");
+            index++;
+            String input;
+            if (index < scriptLines.size()) {
+                input = scriptLines.get(index);
+            }
+            else {
+                break;
+            }
+            System.out.println(input);
+
+            if (input.length() == 0) {
+                System.out.print("Please enter a command");
+            }
+            if (input.charAt(0) == 'q') {
+                break;
+            }
+
+            else if (input.charAt(0) == 'm') {
+                System.out.println(" ");
+                int space1 = input.indexOf(' ');
+                int space2 = input.indexOf(' ', space1+1);
+                int loc1 = Integer.parseInt(input.substring(space1+1, space2));
+                int loc2 = Integer.parseInt(input.substring(space2+1, input.length()));
+                for (int i = loc1; i <= loc2; i++) {
+                    System.out.println("[" + i + "]" + " = " + data_memory[i]);
+                }
+                System.out.println(" ");
+            }
+
+            else if (input.charAt(0) == 's') {
+                if (input.length() > 1) {
+                    System.out.println(input.charAt(1) + "instruction(s) executed");
+                    for (int i = 0; i < input.charAt(1); i ++) {
+                        if (pc[0] < write.size()){
+                            runnable.run();
+                        }
+                    }
+                }
+                else {
+                    System.out.println("1 instruction(s) executed");
+                    if (pc[0] < write.size()){
+                        runnable.run();
+                    }
+                }
+            }
+
+            else if (input.charAt(0) == 'r') {
+                while (pc[0] < write.size()) {
+                    runnable.run();
+                }
+            }
+            
+            else if (input.charAt(0) == 'c'){
+                System.out.println("Simulator reset\n");
+                for (int i = 0; i < 32; i++) {
+                    registers[i] = 0;
+                }
+                for (int i = 0; i < 8192; i++) {
+                    data_memory[i] = 0;
+                }
+                pc[0] = 0;
+            }
+            
+            else if (input.charAt(0) == 'h') {
+                System.out.print("\nh = show help\nd = dump register state\ns = single step through the program (i.e. execute 1 instruction and stop)\ns num = step through num instructions of the program\nr = run until the program ends\nm num1 num2 = display data memory from location num1 to num2\nc = clear all registers, memory, and the program counter to 0\nq = exit the program\n\n");
+            }
+            
+            else if (input.charAt(0) == 'd') {
+                System.out.println("\npc = " + pc[0]);
+                System.out.format("" + 
+                "$0 = %d          $v0 = %d         $v1 = %d         $a0 = %d \n" +
+                "$a1 = %d         $a2 = %d         $a3 = %d         $t0 = %d\n" +
+                "$t1 = %d         $t2 = %d         $t3 = %d         $t4 = %d\n" +
+                "$t5 = %d         $t6 = %d         $t7 = %d         $s0 = %d\n" +
+                "$s1 = %d         $s2 = %d         $s3 = %d         $s4 = %d\n" +
+                "$s5 = %d         $s6 = %d         $s7 = %d         $t8 = %d\n" +
+                "$t9 = %d         $sp = %d         $ra = %d\n\n", 
+                registers[0], registers[2],registers[3], registers[4], 
+                registers[5], registers[6], registers[7], registers[8], 
+                registers[9], registers[10], registers[11], registers[12], 
+                registers[13], registers[14], registers[15], registers[16], 
+                registers[17], registers[18], registers[19], registers[20], 
+                registers[21], registers[22], registers[23], registers[24], 
+                registers[25], registers[29], registers[31]);
 
                 
             }
@@ -243,7 +468,7 @@ public class lab3 extends instructions {
     public static ArrayList<String> getScripts(Scanner reader) {
         ArrayList<String> lst = new ArrayList<>();
         while(reader.hasNextLine()) {
-            lst.add(reader.next());
+            lst.add(reader.nextLine());
         }
         return lst;
     }
@@ -320,7 +545,7 @@ public class lab3 extends instructions {
                 String rs = reg_codes.get(split[2]);
                 String temp = Integer.toBinaryString(Integer.parseInt(split[3]));
                 String imm = changeBinLen(temp, 16, Integer.parseInt(split[3]));
-                Addi curr = new Addi(rt, rs, imm);
+                Addi curr = new Addi(rs, rt, imm);
                 curr.printObj();
                 instructions.add(curr);
             }
