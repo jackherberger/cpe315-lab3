@@ -41,19 +41,15 @@ public class lab3 extends instructions {
 
         final int[] pc = {0};
 
-
         Runnable runnable = new Runnable() {
             public void run() {
                 Object curr = write.get(pc[0]);
-                
-
                 if (curr.getClass().equals(instructions.And.class)){
                     And obj = (And) curr;
                     Integer rs = Integer.parseInt(obj.rs, 2);
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] & registers[rt];
-                    System.out.println(registers[rd]);
                 }
                 else if (curr.getClass().equals(instructions.Or.class)){
                     Or obj = (Or) curr;
@@ -61,7 +57,6 @@ public class lab3 extends instructions {
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = (registers[rs] | registers[rt]);
-                    System.out.println(registers[rd]);
                 }
                 else if (curr.getClass().equals(instructions.Add.class)){
                     Add obj = (Add) curr;
@@ -69,7 +64,6 @@ public class lab3 extends instructions {
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] + registers[rt];
-                    System.out.println(registers[rd]);
                 }
                 else if (curr.getClass().equals(instructions.Sll.class)){
                     Sll obj = (Sll) curr;
@@ -77,7 +71,6 @@ public class lab3 extends instructions {
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer sa = Integer.parseInt(obj.sa, 2);
                     registers[rd] = registers[rt] << sa;
-                    System.out.println(registers[rd]);
                 }
                 else if (curr.getClass().equals(instructions.Sub.class)){
                     Sub obj = (Sub) curr;
@@ -85,7 +78,6 @@ public class lab3 extends instructions {
                     Integer rt = Integer.parseInt(obj.rt, 2);
                     Integer rd = Integer.parseInt(obj.rd, 2);
                     registers[rd] = registers[rs] - registers[rt];
-                    System.out.println(registers[rd]);
                 }
                 else if (curr.getClass().equals(instructions.Slt.class)){
                     Slt obj = (Slt) curr;
@@ -97,7 +89,6 @@ public class lab3 extends instructions {
                         set = 1;
                     }
                     registers[rd] = set;
-                    System.out.println(registers[rd]);
                 }
                 else if (curr.getClass().equals(instructions.Jr.class)){
                     Jr obj = (Jr) curr;
@@ -105,29 +96,56 @@ public class lab3 extends instructions {
                     pc[0] = rs;
                 }
                 else if (curr.getClass().equals(instructions.Addi.class)){
-                    System.out.println("True");
+                    Addi obj = (Addi) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer imm = Integer.parseInt(obj.imm, 2);
+                    registers[rt] = registers[rs] + imm;
                 }
                 else if (curr.getClass().equals(instructions.Beq.class)){
-                    System.out.println("True");
+                    Beq obj = (Beq) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    byte b_offset = (byte)((int)offset);
+                    if (rs == rt){
+                        pc[0] += b_offset;
+                    }
                 }
                 else if (curr.getClass().equals(instructions.Bne.class)){
-                    System.out.println("True");
+                    Bne obj = (Bne) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    byte b_offset = (byte)((int)offset);
+                    if (rs != rt){
+                        pc[0] += b_offset;
+                    }
                 }
                 else if (curr.getClass().equals(instructions.Lw.class)){
-                    System.out.println("True");
+                    Lw obj = (Lw) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    registers[rt] = data_memory[rs+offset];
                 }
                 else if (curr.getClass().equals(instructions.Sw.class)){
-                    System.out.println("True");
+                    Sw obj = (Sw) curr;
+                    Integer rs = Integer.parseInt(obj.rs, 2);
+                    Integer rt = Integer.parseInt(obj.rt, 2);
+                    Integer offset = Integer.parseInt(obj.offset, 2);
+                    registers[rs+offset] = data_memory[rt];
                 }
                 else if (curr.getClass().equals(instructions.J.class)){
-                    System.out.println("True");
+                    Jal obj = (Jal)curr;
+                    pc[0] = Integer.parseInt(obj.target, 2);
                 }
                 else if (curr.getClass().equals(instructions.Jal.class)){
-                    System.out.println("True");
+                    Jal obj = (Jal)curr;
+                    registers[28] = pc[0];
+                    pc[0] = Integer.parseInt(obj.target, 2);
                 }
                 pc[0]++;
-            
-
             }
         };
 
@@ -191,17 +209,52 @@ public class lab3 extends instructions {
             }
             
             else if (input.charAt(0) == 'd') {
+                System.out.println("PC = " + pc[0]);
+                System.out.format("\n$0 = %d          $v0 = %d         $v1 = %d         $a0 = %d \n" +
+                "$a1 = %d         $a2 = %d         $a3 = %d         $t0 = %d\n" +
+                "$t1 = %d         $t2 = %d         $t3 = %d         $t4 = %d\n" +
+                "$t5 = %d         $t6 = %d         $t7 = %d         $s0 = %d\n" +
+                "$s1 = %d         $s2 = %d         $s3 = %d         $s4 = %d\n" +
+                "$s5 = %d         $s6 = %d         $s7 = %d         $t8 = %d\n" +
+                "$t9 = %d         $sp = %d         $ra = %d\n\n", 
+                    registers[0], registers[1], registers[2],registers[3], registers[4], 
+                    registers[5], registers[6], registers[7], registers[8], registers[9], 
+                    registers[10], registers[11], registers[12], registers[13], registers[14], 
+                    registers[15], registers[16], registers[17], registers[18], registers[19], 
+                    registers[20], registers[21], registers[22], registers[23], registers[24], 
+                    registers[25], registers[26], registers[27]);
 
-                ArrayList<String> keysList = new ArrayList<>();
-                Enumeration<String> keys = reg_codes.keys();
-                while (keys.hasMoreElements()) {
-                    keysList.add(keys.nextElement());
-                }
+                // String[] lines = originalString.split("\n");
+                // StringBuilder updatedString = new StringBuilder();
 
-                System.out.println("pc = " + pc);
-                for (int i = 0; i < registers.length; i ++){
-                    System.out.println("$" + keysList.get(i) + " = " + registers[i]);
-                }
+                // for (int i = 0; i < registers.length; i++) {
+                //     String[] parts = lines[i].split("=");
+                //     System.out.println(parts[0]);
+                //     if (parts.length == 2) {
+                //         String originalText = parts[0].trim();
+                //         String replacement = originalText + " = " + registers[i];
+                //         updatedString.append(replacement);
+
+                //         if (i < registers.length - 1) {
+                //             updatedString.append("         "); // Adjust the number of spaces as needed
+                //         }
+                //         updatedString.append("\n");
+                //     }
+                // }
+
+                // String result = updatedString.toString();
+                // System.out.println(result);
+
+                // ArrayList<String> keysList = new ArrayList<>();
+                // Enumeration<String> keys = reg_codes.keys();
+                // while (keys.hasMoreElements()) {
+                //     keysList.add(keys.nextElement());
+                // }
+
+                // System.out.println("pc = " + pc[0]);
+                // for (int i = 0; i < registers.length; i ++){
+                //     System.out.println("$" + keysList.get(i) + " = " + registers[i]);
+                // }
                 
             }
         }
