@@ -145,12 +145,12 @@ public class lab3 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.J.class)){
                     J obj = (J)curr;
-                    pc[0] = Integer.parseInt(obj.target, 2);
+                    pc[0] = Integer.parseInt(obj.target, 2) - 1;
                 }
                 else if (curr.getClass().equals(instructions.Jal.class)){
                     Jal obj = (Jal)curr;
                     registers[31] = pc[0];
-                    pc[0] = Integer.parseInt(obj.target, 2);
+                    pc[0] = Integer.parseInt(obj.target, 2) - 1;
                 }
                 pc[0]++;
             }
@@ -357,13 +357,13 @@ public class lab3 extends instructions {
                 }
                 else if (curr.getClass().equals(instructions.J.class)){
                     J obj = (J)curr;
-                    pc[0] = Integer.parseInt(obj.target, 2);
+                    pc[0] = Integer.parseInt(obj.target, 2) - 1;
                 }
                 else if (curr.getClass().equals(instructions.Jal.class)){
                     Jal obj = (Jal)curr;
                     registers[31] = pc[0];
                     System.out.println("Jump to spot: " + Integer.parseInt(obj.target, 2));
-                    pc[0] = Integer.parseInt(obj.target, 2);
+                    pc[0] = Integer.parseInt(obj.target, 2) - 1;
                 }
                 pc[0]++;
             }
